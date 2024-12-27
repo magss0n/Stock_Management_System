@@ -12,9 +12,9 @@ public class Supplier extends Person{
     @Override
     public String toString() {
         return "Supplier{" +
-                "location='" + location + '\'' +
-                ", name='" + name + '\'' +
+                "name='" + name + '\'' +
                 ", contact='" + contact + '\'' +
+                ", location='" + location + '\'' +
                 '}';
     }
 }

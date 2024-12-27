@@ -4,7 +4,7 @@ import java.sql.Time;
 
 public class Product{
     public String name;
-    public Integer qty;
+    private Integer qty;
     public Double sellPrice;
 
     private Integer id = 0;
@@ -18,11 +18,32 @@ public class Product{
         id = ID;
     }
 
+    public void setQty(Integer qty) {
+        this.qty = qty;
+    }
+
+    public Integer getQty() {
+        return qty;
+    }
+
+    public Double getCostPrice() {
+        return costPrice;
+    }
+
+    public void setCostPrice(Double costPrice) {
+        this.costPrice = costPrice;
+    }
+
+    public Boolean isAvailable( Integer qty){
+        return this.qty >= qty;
+
+    }
+
     @Override
     public String toString() {
         return "Product{" +
                 "id='" + id + '\'' +
-                "name='" + name + '\'' +
+                ", name='" + name + '\'' +
                 ", costPrice=" + costPrice +
                 ", sellPrice=" + sellPrice +
                 ", qty=" + qty +

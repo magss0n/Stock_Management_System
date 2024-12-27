@@ -26,6 +26,8 @@ public class RecordEntity {
     public static Supplier supplier(String title){
         
         Stage window = new Stage();
+        window.setOnCloseRequest(windowEvent -> sup = null);
+
 
         window.initModality(Modality.APPLICATION_MODAL);
         window.setTitle(title);
@@ -44,7 +46,10 @@ public class RecordEntity {
 
         Button save = new Button("Save");
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> window.close());
+        cancel.setOnAction(event -> {
+            sup = null;
+            window.close();
+        });
 
         GridPane gridPane = new GridPane();
         gridPane.add(l1,0,0);
@@ -88,6 +93,7 @@ public class RecordEntity {
     public static Customer customer(String title){
 
         Stage window = new Stage();
+        window.setOnCloseRequest(windowEvent -> cust = null);
 
         window.initModality(Modality.APPLICATION_MODAL);
         window.setTitle(title);
@@ -106,7 +112,10 @@ public class RecordEntity {
 
         Button closeButton = new Button("Save");
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> window.close());
+        cancel.setOnAction(event -> {
+            cust = null;
+            window.close();
+        });
 
         GridPane gridPane = new GridPane();
         gridPane.add(l1,0,0);
@@ -149,6 +158,7 @@ public class RecordEntity {
 
     public static Product product(String title){
         Stage window = new Stage();
+        window.setOnCloseRequest(windowEvent -> prod = null);
 
         window.initModality(Modality.APPLICATION_MODAL);
         window.setTitle(title);
@@ -167,7 +177,10 @@ public class RecordEntity {
 
         Button save = new Button("Save");
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> window.close());
+        cancel.setOnAction(event -> {
+            prod = null;
+            window.close();
+        });
 
         GridPane gridPane = new GridPane();
         gridPane.add(l1,0,0);
