@@ -42,6 +42,9 @@ public class Main extends Application {
         //creating label password
         Text text2 = new Text("Password:");
 
+        //creating label welcome
+        Text text3 = new Text("Welcome to our System");
+
         //Creating Text Filed for email
         TextField idField = new TextField("Enter Id");
 
@@ -67,9 +70,6 @@ public class Main extends Application {
         //Creating a Grid Pane
         GridPane gridPane = new GridPane();
 
-        //Setting size for the pane
-        gridPane.setMinSize(800, 800);
-
         //Setting the padding
         gridPane.setPadding(new Insets(10, 10, 10, 10));
 
@@ -87,10 +87,17 @@ public class Main extends Application {
         gridPane.add(passwordField, 1, 1);
         gridPane.add(button1, 0, 2);
         gridPane.add(button2, 1, 2);
-        gridPane.setStyle("-fx-background-color: BEIGE;");
+
+        VBox vbox = new VBox(40);
+        vbox.setAlignment(Pos.CENTER);
+        vbox.setStyle("-fx-background-color: BEIGE;");
+        vbox.getChildren().addAll(text3, gridPane);
+
+        //Setting size for the pane
+        vbox.setMinSize(800, 800);
 
         //Creating a scene object
-        scene1 = new Scene(gridPane);
+        scene1 = new Scene(vbox);
 
         //Setting title to the Stage
         window.setTitle("Stock Management");
@@ -119,9 +126,16 @@ public class Main extends Application {
         Button b3 = new Button("View Stock");
         b3.setOnAction(event -> viewStock());
 
-        Button b4 = new Button("Exit");
+        Button b4 = new Button("View Customers/Suppliers");
+        b4.setOnAction(event -> viewCustomersOrSuppliers());
 
-        layout.getChildren().addAll(welcome,b1,b2,b3,b4);
+        Button b5 = new Button("Exit");
+        b5.setStyle("-fx-color: RED;");
+        b5.setOnAction(event -> {
+            if(AlertBox.confirm("Exit")) window.close();
+        });
+
+        layout.getChildren().addAll(welcome,b1,b2,b3,b4,b5);
         layout.setAlignment(Pos.CENTER);
         scene2 = new Scene(layout);
 
@@ -181,7 +195,7 @@ public class Main extends Application {
 
         newSupplier.setOnAction(event -> {
             Supplier s = RecordEntity.supplier("New Supplier");
-
+            System.out.println("Supplier: " + s);
             if (s != null) {
                 suppliers.add(s);
                 supplierlist.getItems().add(suppliers.stream().map(supplier -> supplier.name).toList().getLast());
@@ -216,7 +230,6 @@ public class Main extends Application {
                 AlertBox.display("Successful", "Stock Entry Successfully saved");
                 window.setScene(scene2);
             }
-
             else AlertBox.display("Error", "One of the  required fields is empty");
         });
 
@@ -302,14 +315,14 @@ public class Main extends Application {
             if (customers.contains(custSelected) && stock.getProducts().contains(prodSelected) && !qty.getText().isEmpty() && !amount.getText().isEmpty()){
                 Integer quantity = Integer.parseInt(qty.getText());
                 Double amt = Double.parseDouble(amount.getText());
-                if (stock.editProduct(prodSelected, quantity)){
+
+                if (stock.editProductQty(prodSelected, quantity)){
                     stockMovement.stockSales.add(new StockExit(custSelected, prodSelected,amt, quantity));
                     System.out.println("Sales: " + stockMovement.stockSales);
                     AlertBox.display("Successful", "Stock Exit Successfully saved");
                 }
 
                 window.setScene(scene2);
-
             }
 
             else AlertBox.display("Error", "One of the  required fields is empty");
@@ -328,23 +341,131 @@ public class Main extends Application {
 
 
     private static void viewStock(){
-
         ObservableList<Product> products = FXCollections.observableArrayList(stock.getProducts());
         ListView<Product> listView = new ListView<>(products);
+        listView.setOnMouseClicked(mouseEvent -> {
+            if(!listView.getItems().isEmpty()){
+                prodSelected = listView.getSelectionModel().getSelectedItem();
+                stock.editProduct(prodSelected);
+                viewStock();
+            }
+        });
         listView.setMaxSize(600,600);
 
         Button back = new Button("Back");
         back.setOnAction(event -> window.setScene(scene2));
 
+        Button newProduct = new Button("New Product");
+        newProduct.setOnAction(event -> {
+            Product p = RecordEntity.product("New Product");
+            if(p != null){
+                stock.addProduct(p);
+                viewStock();
+            }
+            System.out.println("Product: " + p);
+        });
+
         Label l = new Label("Products");
+
+        HBox hbox = new HBox(60);
+        hbox.setAlignment(Pos.CENTER);
+        hbox.getChildren().addAll(back, newProduct);
 
         VBox vbox = new VBox(40);
 
-        vbox.getChildren().addAll(l,listView, back);
+        vbox.getChildren().addAll(l,listView, hbox);
         vbox.setAlignment(Pos.CENTER);
 
-
         scene1 = new Scene(vbox, 800, 800);
+
+        window.setScene(scene1);
+    }
+
+    private static void viewCustomersOrSuppliers(){
+        ObservableList<Customer> customerObservableList = FXCollections.observableArrayList(customers);
+        ListView<Customer> customerListView = new ListView<>(customerObservableList);
+
+        customerListView.setOnMouseClicked(mouseEvent -> {
+            if(!customerListView.getItems().isEmpty()){
+                custSelected = customerListView.getSelectionModel().getSelectedItem();
+                if(custSelected != null){
+                    Integer i = customers.indexOf(custSelected);
+                    EditEntity.customer(customers.get(i));
+                    viewCustomersOrSuppliers();
+                }
+            }
+        });
+        customerListView.setMaxSize(500,400);
+
+        Button back = new Button("Back");
+        back.setOnAction(event -> window.setScene(scene2));
+
+        Button newCustomer = new Button("New Customer");
+        newCustomer.setOnAction(event -> {
+            Customer c = RecordEntity.customer("New Customer");
+            if(c != null){
+                customers.add(c);
+                viewCustomersOrSuppliers();
+            }
+            System.out.println("Customer: " + c);
+        });
+
+        Label l = new Label("Customers");
+
+        VBox vbox = new VBox(40);
+
+        vbox.getChildren().addAll(l,customerListView);
+        vbox.setAlignment(Pos.CENTER);
+
+        ObservableList<Supplier> supplierObservableList = FXCollections.observableArrayList(suppliers);
+        ListView<Supplier> supplierListView = new ListView<>(supplierObservableList);
+
+        supplierListView.setOnMouseClicked(mouseEvent -> {
+            if(!supplierListView.getItems().isEmpty()){
+                supSelected = supplierListView.getSelectionModel().getSelectedItem();
+                if(supSelected != null){
+                    Integer i = suppliers.indexOf(supSelected);
+                    EditEntity.supplier(suppliers.get(i));
+                    viewCustomersOrSuppliers();
+                }
+            }
+        });
+
+        supplierListView.setMaxSize(500,400);
+
+        Button newSupplier = new Button("New Supplier");
+        newSupplier.setOnAction(event -> {
+            Supplier s = RecordEntity.supplier("New Supplier");
+            if(s != null){
+                suppliers.add(s);
+                viewCustomersOrSuppliers();
+            }
+            System.out.println("Supplier: " + s);
+        });
+
+        Label l1 = new Label("Suppliers");
+
+        VBox vbox1 = new VBox(40);
+
+        vbox1.getChildren().addAll(l1, supplierListView);
+        vbox1.setAlignment(Pos.CENTER);
+
+
+        HBox hbox1 = new HBox(100);
+        hbox1.setAlignment(Pos.CENTER);
+
+        hbox1.setAlignment(Pos.CENTER);
+        hbox1.getChildren().addAll(back, newCustomer, newSupplier);
+
+        HBox hbox = new HBox(100);
+        hbox.setAlignment(Pos.CENTER);
+        hbox.getChildren().addAll(vbox,vbox1);
+
+        VBox layout = new VBox(60);
+        layout.getChildren().addAll(hbox, hbox1);
+        layout.setAlignment(Pos.CENTER);
+
+        scene1 = new Scene(layout, 800, 800);
 
         window.setScene(scene1);
     }
