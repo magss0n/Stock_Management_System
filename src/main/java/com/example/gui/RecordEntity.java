@@ -133,6 +133,7 @@ public class RecordEntity {
         gridPane.setHgap(10);
         gridPane.setVgap(10);
         gridPane.setAlignment(Pos.CENTER);
+
         closeButton.setOnAction(event -> {
             if(location.getText().isEmpty() || name.getText().isEmpty() || contact.getText().isEmpty()){
                 AlertBox.display("Error!!", "One the required fields is empty...");
@@ -199,15 +200,20 @@ public class RecordEntity {
         gridPane.setVgap(10);
         gridPane.setAlignment(Pos.CENTER);
         save.setOnAction(event -> {
-            if(name.getText().isEmpty() || cost.getText().isEmpty() || sell.getText().isEmpty()){
-                AlertBox.display("Error!!", "One the required fields is empty...");
-            }
-            else {
-                prod = new Product(name.getText(), Double.parseDouble(cost.getText()), Double.parseDouble(sell.getText()), prodId);
-                prodId++;
-                AlertBox.display("Creation", "Product created successfully");
+            try{
+                if(name.getText().isEmpty() || cost.getText().isEmpty() || sell.getText().isEmpty()){
+                    AlertBox.display("Error!!", "One the required fields is empty...");
+                }
+                else if(Double.parseDouble(cost.getText()) >= Double.parseDouble(sell.getText())) AlertBox.display("Error", "Sell price should be greater than cost price");
+                else {
+                    prod = new Product(name.getText(), Double.parseDouble(cost.getText()), Double.parseDouble(sell.getText()), prodId);
+                    prodId++;
+                    AlertBox.display("Creation", "Product created successfully");
 
-                window.close();
+                    window.close();
+                }
+            } catch (Exception e) {
+                AlertBox.display("Error","Cost and Sell price should be numbers");
             }
         });
 
