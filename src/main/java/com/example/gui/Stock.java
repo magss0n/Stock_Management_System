@@ -21,7 +21,7 @@ public class Stock {
 
     public void setQty(Product p, Integer qty){
         if(!products.contains(p)){
-            System.out.println("Product not found");
+            AlertBox.display("Error","Product not found");
         }
         else {
             Integer i = products.indexOf(p);

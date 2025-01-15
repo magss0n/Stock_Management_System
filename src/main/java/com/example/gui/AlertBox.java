@@ -44,7 +44,7 @@ public class AlertBox {
         Stage window = new Stage();
 
         window.initModality(Modality.APPLICATION_MODAL);
-        window.setTitle("Deletion !!");
+        window.setTitle(title+"!!");
 
         Label label = new Label();
         label.setText("Are you sure? ");

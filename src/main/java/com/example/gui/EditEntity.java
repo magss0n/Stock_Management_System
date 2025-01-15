@@ -160,13 +160,16 @@ public class EditEntity {
         t.setText("Record New Product details");
 
         Label l1 = new Label("Name:");
-        TextField name = new TextField("" + p.name);
+        TextField name = new TextField(p.name);
 
         Label l2 = new Label("Cost Price:");
         TextField cost = new TextField("" + p.getCostPrice());
 
         Label l3 = new Label("Sell Price:");
         TextField sell = new TextField("" + p.sellPrice);
+
+        Label l4 = new Label("Qty:");
+        TextField qty = new TextField("" + p.getQty());
 
         Button save = new Button("Save");
         Button cancel = new Button("Cancel");
@@ -183,6 +186,9 @@ public class EditEntity {
         gridPane.add(l3, 0,2);
         gridPane.add(sell, 1,2);
 
+        gridPane.add(l4, 0,3);
+        gridPane.add(qty, 1,3);
+
         gridPane.add(save, 5,5);
         gridPane.add(cancel, 6, 5);
         gridPane.add(delete, 7, 5);
@@ -192,16 +198,22 @@ public class EditEntity {
         gridPane.setAlignment(Pos.CENTER);
 
         save.setOnAction(event -> {
-            if(name.getText().isEmpty() || cost.getText().isEmpty() || sell.getText().isEmpty()){
-                AlertBox.display("Error!!", "One the required fields is empty...");
-            }
-            else {
-                p.setCostPrice(Double.parseDouble(cost.getText()));
-                p.sellPrice = Double.parseDouble(sell.getText());
-                p.name = name.getText();
+            try{
+                if(name.getText().isEmpty() || cost.getText().isEmpty() || sell.getText().isEmpty() || qty.getText().isEmpty()){
+                    AlertBox.display("Error!!", "One the required fields is empty...");
+                }
+                else if(Double.parseDouble(cost.getText()) >= Double.parseDouble(sell.getText())) AlertBox.display("Error", "Sell price should be greater than cost price");
+                else {
+                    p.setCostPrice(Double.parseDouble(cost.getText()));
+                    p.sellPrice = Double.parseDouble(sell.getText());
+                    p.name = name.getText();
+                    p.setQty(Integer.parseInt(qty.getText()));
 
-                AlertBox.display("Edit", "Product Edited successfully");
-                window.close();
+                    AlertBox.display("Edit", "Product Edited successfully");
+                    window.close();
+                }
+            } catch (Exception e) {
+                AlertBox.display("Error","Cost, Sell price and Quantity should be numbers");
             }
         });
 
