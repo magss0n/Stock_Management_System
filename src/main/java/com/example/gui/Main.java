@@ -30,6 +30,8 @@ public class Main extends Application {
     static Product prodSelected;
     static Stock stock = new Stock();
     static StockMovement stockMovement = new StockMovement();
+    static Integer attempts = 0;
+
 
 
     @Override
@@ -56,9 +58,18 @@ public class Main extends Application {
         button1.setOnAction(event -> {
             if (!admin.authenticate(idField.getText(),passwordField.getText())) {
                 AlertBox.display("Error!", "Invalid user Id or Password");
+                attempts += 1;
+                if (attempts == 2){
+                    AlertBox.display("Caution", "You have 1 attempt left");
+                }
+                if (attempts == 3){
+                    AlertBox.display("Shutting Down", "Too many failed login attempts");
+                    window.close();
+                }
             }
             else {
                 mainMenu();
+
             }
         });
         Button button2 = new Button("Clear");
@@ -222,13 +233,23 @@ public class Main extends Application {
             }
 
             if (suppliers.contains(supSelected) && stock.getProducts().contains(prodSelected) && !qty.getText().isEmpty() && !amount.getText().isEmpty()){
-                Integer quantity = Integer.parseInt(qty.getText());
-                Double amt = Double.parseDouble(amount.getText());
-                stock.setQty(prodSelected, quantity);
-                stockMovement.stockPurchases.add(new StockEntry(supSelected,amt, prodSelected, quantity));
-                System.out.println("Entries" + stockMovement.stockPurchases);
-                AlertBox.display("Successful", "Stock Entry Successfully saved");
-                window.setScene(scene2);
+                try{
+                    Integer quantity = Integer.parseInt(qty.getText());
+                    Double amt = Double.parseDouble(amount.getText());
+                    if(amt/quantity > prodSelected.getCostPrice()){
+                        AlertBox.display("Error", "Purchase amount and Quantity do not match Cost Price");
+                    }
+                    else{
+                        stock.setQty(prodSelected, quantity);
+                        stockMovement.stockPurchases.add(new StockEntry(supSelected,amt, prodSelected, quantity));
+                        System.out.println("Entries" + stockMovement.stockPurchases);
+                        AlertBox.display("Successful", "Stock Entry Successfully saved");
+                        window.setScene(scene2);
+                    }
+
+                } catch (Exception e) {
+                    AlertBox.display("Error", "Quantity and Purchase amount should be numbers");
+                }
             }
             else AlertBox.display("Error", "One of the  required fields is empty");
         });
@@ -313,18 +334,23 @@ public class Main extends Application {
             }
 
             if (customers.contains(custSelected) && stock.getProducts().contains(prodSelected) && !qty.getText().isEmpty() && !amount.getText().isEmpty()){
-                Integer quantity = Integer.parseInt(qty.getText());
-                Double amt = Double.parseDouble(amount.getText());
+                try {
+                    Integer quantity = Integer.parseInt(qty.getText());
+                    Double amt = Double.parseDouble(amount.getText());
 
-                if (stock.editProductQty(prodSelected, quantity)){
-                    stockMovement.stockSales.add(new StockExit(custSelected, prodSelected,amt, quantity));
-                    System.out.println("Sales: " + stockMovement.stockSales);
-                    AlertBox.display("Successful", "Stock Exit Successfully saved");
+                    if (stock.editProductQty(prodSelected, quantity)){
+                        stockMovement.stockSales.add(new StockExit(custSelected, prodSelected,amt, quantity));
+                        System.out.println("Sales: " + stockMovement.stockSales);
+                        AlertBox.display("Successful", "Stock Exit Successfully saved");
+                        window.setScene(scene2);
+
+                    }
+
+                } catch (Exception e) {
+                    AlertBox.display("Error","Quantity and Sales amount should be numbers");
                 }
 
-                window.setScene(scene2);
             }
-
             else AlertBox.display("Error", "One of the  required fields is empty");
         });
 
