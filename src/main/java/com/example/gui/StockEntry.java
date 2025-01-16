@@ -1,20 +1,16 @@
 package com.example.gui;
 
-import java.util.Date;
-
 public class StockEntry{
     Supplier supplier;
     Double purchaseAmt;
     Product product;
     Integer qtyBought;
-    Date date;
 
     public StockEntry(Supplier s, Double amt, Product p, Integer qty){
         supplier = s;
         purchaseAmt = amt;
         product = p;
         qtyBought = qty;
-        date = new Date();
     }
 
     public void viewPurchaseDetails(){
@@ -32,7 +28,6 @@ public class StockEntry{
                 ", purchaseAmt=" + purchaseAmt +
                 ", product=" + product +
                 ", qtyBought=" + qtyBought +
-                ", date=" + date +
                 '}';
     }
 }

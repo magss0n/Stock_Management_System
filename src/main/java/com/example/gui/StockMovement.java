@@ -23,7 +23,8 @@ public void addPurchase(StockEntry purchase){
     }
 
     public void viewSalesReports(){
-
+    SalesReport report = new SalesReport(this);
+    report.display();
 
     }
 

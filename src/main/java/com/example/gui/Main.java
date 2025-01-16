@@ -133,16 +133,19 @@ public class Main extends Application {
         b5.setOnAction(event -> {
             PurchaseReport report = new PurchaseReport(stockMovement);
             report.display();
-        });// qdded b5 b6 for purchase and sales reports
-
-
+        });
+        Button b6 = new Button("View Purchase Report");
+        b6.setOnAction(event -> {
+            SalesReport report = new SalesReport(stockMovement);
+            report.display();
+        });
         Button b7 = new Button("Exit");
         b7.setStyle("-fx-color: RED;");
         b7.setOnAction(event -> {
             if(AlertBox.confirm("Exit")) window.close();
         });
 
-        layout.getChildren().addAll(welcome,b1,b2,b3,b4,b5,b7); //added all buttons
+        layout.getChildren().addAll(welcome,b1,b2,b3,b4,b5,b6,b7); //added all buttons
         layout.setAlignment(Pos.CENTER);
         scene2 = new Scene(layout);
 
