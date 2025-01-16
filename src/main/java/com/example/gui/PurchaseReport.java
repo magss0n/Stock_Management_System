@@ -1,9 +1,19 @@
 package com.example.gui;
 
-import eu.hansolo.tilesfx.tools.FlowGridPane;
-import org.w3c.dom.Text;
 
-import java.awt.*;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+
+
+
 
 public class PurchaseReport {
     private StockMovement stockMovement;
@@ -20,40 +30,52 @@ public class PurchaseReport {
 
         Text title = new Text("Purchase Transaction report");
 
-        GridPane header = mew GridPane();
-        header.add(new label("Supplier"),0,0);
-        header.add(new label("Product"),1,0);
-        header.add(new label("Quantity"),2,0);
-        header.add(new label("Amount"),3,0);
+        GridPane header = new GridPane();
+        header.add(new Label("Supplier"),0,0);
+        header.add(new Label("Product"),1,0);
+        header.add(new Label("Quantity"),2,0);
+        header.add(new Label("Amount"),3,0);
         header.setHgap(40);
-        header.setAlignment(pos,CENTER);
+        header.setAlignment(Pos.CENTER);
 
         VBox transactionList = new VBox(10);
-        transactionList = setAligment(pos.CENTER);
+        transactionList.setAlignment(Pos.CENTER);
 
 
-        for(StockEntry entry : stockMovement.stockPurchases){
-            FlowGridPane now = new GridPane();
-            row.add(new Label(entry.supplier.name),0,0);
-            row.add(new Label(entry.product.name),1,0);
-            row.add(new Label(entry.qtyBought.toString()),2,0);
-            row.add(new Label("$"+entry.purchaseAmt.toString()),3,0);
-            row.setHgap(40);
-            row.setAlignmentList.getChildren().add(now);
+        if (stockMovement != null&& stockMovement.stockPurchases !=null){
 
+            for (StockEntry entry : stockMovement.stockPurchases){
+                GridPane row = new GridPane();
+
+                String supplierName = entry.supplier !=null ? entry.supplier.name : "None";
+                String productName = entry.product !=null ? entry.product.name : "None";
+                String quantity = entry.qtyBought !=null ? entry.qtyBought.toString(): "0";
+                String amount = entry.purchaseAmt !=null ? entry.purchaseAmt.toString(): "0";
+
+
+                row.add(new Label(supplierName),0,0);
+                row.add(new Label(productName),1,0);
+                row.add(new Label(quantity),2,0);
+                row.add(new Label("$" + amount),3,0);
+                row.setHgap(40);
+                row.setAlignment(Pos.CENTER);
+
+                transactionList.getChildren().add(row);
+            }
         }
 
-        ScrollPane scrollPane = new scrollPane();
-        scrollPane = setContent(transactionList);
-        scrollPane = setFitToWidth(true);
-        scrollPane = setMaxHeight(400);
+
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setContent(transactionList);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setMaxHeight(400);
 
         Button close = new Button("Close");
         close.setOnAction(e -> window.close());
 
-        vBox layout = mew VBox(20);
+        VBox layout = new VBox(20);
         layout.getChildren().addAll(title, header,scrollPane,close);
-        layout.setAlignment(pos.CENTER);
+        layout.setAlignment(Pos.CENTER);
         layout.setMinSize(600,600);
 
         Scene scene = new Scene(layout);
