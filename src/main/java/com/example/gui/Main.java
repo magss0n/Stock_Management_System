@@ -140,13 +140,20 @@ public class Main extends Application {
         Button b4 = new Button("View Customers/Suppliers");
         b4.setOnAction(event -> viewCustomersOrSuppliers());
 
-        Button b5 = new Button("Exit");
-        b5.setStyle("-fx-color: RED;");
-        b5.setOnAction(event -> {
+        Button b5 = new Button("View Purchase Report");
+        b5.setOnAction(event -> new PurchaseReport((stockMovement)).display());// added b5 b6 for purchase and sales reports
+
+        Button b6 = new Button("View Sales Report");
+        b6.setOnAction(event -> new PurchaseReport((stockMovement)).display());
+
+
+        Button b7 = new Button("Exit");
+        b7.setStyle("-fx-color: RED;");
+        b7.setOnAction(event -> {
             if(AlertBox.confirm("Exit")) window.close();
         });
 
-        layout.getChildren().addAll(welcome,b1,b2,b3,b4,b5);
+        layout.getChildren().addAll(welcome,b1,b2,b3,b4,b5,b6,b7); //added all buttons
         layout.setAlignment(Pos.CENTER);
         scene2 = new Scene(layout);
 
