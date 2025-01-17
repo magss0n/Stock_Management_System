@@ -1,17 +1,21 @@
 package com.example.gui;
 
-import java.sql.Time;
 
 public class Product{
     public String name;
     private Integer qty;
     public Double sellPrice;
-
+    public String category;
     private Integer id = 0;
     private Double costPrice;
 
-    public Product(String name, Double costPrice, Double sellP, Integer ID){
+    public Product(){
+
+    }
+
+    public Product(String name, String category, Double costPrice, Double sellP, Integer ID){
         this.name = name;
+        this.category = category;
         this.sellPrice = sellP;
         this.costPrice = costPrice;
         this.qty = 0;
@@ -37,6 +41,38 @@ public class Product{
     public Boolean isAvailable( Integer qty){
         return this.qty >= qty;
 
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Double getSellPrice() {
+        return sellPrice;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSellPrice(Double sellPrice) {
+        this.sellPrice = sellPrice;
     }
 
     @Override

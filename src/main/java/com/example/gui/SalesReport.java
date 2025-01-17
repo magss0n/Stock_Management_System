@@ -12,14 +12,14 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.Date;
 
 
-
-public class PurchaseReport {
+public class SalesReport {
     private StockMovement stockMovement;
     private Stage window;
 
-    public PurchaseReport(StockMovement stockMovement){
+    public SalesReport(StockMovement stockMovement){
         this.stockMovement = stockMovement;
         this.window = new Stage();
     }
@@ -28,14 +28,15 @@ public class PurchaseReport {
         window.initModality(Modality.APPLICATION_MODAL);
         window.setTitle("Purchase report");
 
-        Text title = new Text("Purchase Transaction report");
+        Text title = new Text("Sales Transaction report");
 
         GridPane header = new GridPane();
-        header.add(new Label("Supplier"),0,0);
+        header.add(new Label("Customer"),0,0);
         header.add(new Label("Product"),1,0);
         header.add(new Label("Quantity"),2,0);
         header.add(new Label("Amount"),3,0);
         header.add(new Label("Date"),4,0);
+
         header.setHgap(40);
         header.setAlignment(Pos.CENTER);
 
@@ -45,18 +46,17 @@ public class PurchaseReport {
 
         if (stockMovement != null&& stockMovement.stockPurchases !=null){
 
-            for (StockEntry entry : stockMovement.stockPurchases){
+            for (StockExit sale : stockMovement.stockSales){
                 GridPane row = new GridPane();
 
-                String supplierName = entry.supplier !=null ? entry.supplier.name : "None";
-                String productName = entry.product !=null ? entry.product.name : "None";
-                String quantity = entry.qtyBought !=null ? entry.qtyBought.toString(): "0";
-                String amount = entry.purchaseAmt !=null ? entry.purchaseAmt.toString(): "0";
-                String date = entry.date !=null ? entry.date.toString(): "0";
+                String customerName = sale.customer !=null ? sale.customer.name : "None";
+                String productName =sale.product !=null ? sale.product.name : "None";
+                String quantity = sale.qtySold !=null ? sale.qtySold.toString(): "0";
+                String amount = sale.salesAmt !=null ? sale.salesAmt.toString(): "0";
+                String date = sale.salesAmt !=null ? sale.date.toString(): "0";
 
 
-
-                row.add(new Label(supplierName),0,0);
+                row.add(new Label(customerName),0,0);
                 row.add(new Label(productName),1,0);
                 row.add(new Label(quantity),2,0);
                 row.add(new Label("XAF" + amount),3,0);

@@ -170,6 +170,9 @@ public class RecordEntity {
         Label l1 = new Label("Name:");
         TextField name = new TextField("Enter name");
 
+        Label l4 = new Label("Category:");
+        TextField category = new TextField("Enter category");
+
         Label l2 = new Label("Cost Price");
         TextField cost = new TextField();
 
@@ -187,26 +190,29 @@ public class RecordEntity {
         gridPane.add(l1,0,0);
         gridPane.add(name,1,0);
 
-        gridPane.add(l2, 0,1);
-        gridPane.add(cost, 1,1);
+        gridPane.add(l4,0,1);
+        gridPane.add(category,1,1);
 
-        gridPane.add(l3, 0,2);
-        gridPane.add(sell, 1,2);
+        gridPane.add(l2, 0,2);
+        gridPane.add(cost, 1,2);
 
-        gridPane.add(save, 5,5);
-        gridPane.add(cancel, 6, 5);
+        gridPane.add(l3, 0,3);
+        gridPane.add(sell, 1,3);
+
+        gridPane.add(save, 5,6);
+        gridPane.add(cancel, 6, 6);
 
         gridPane.setHgap(10);
         gridPane.setVgap(10);
         gridPane.setAlignment(Pos.CENTER);
         save.setOnAction(event -> {
             try{
-                if(name.getText().isEmpty() || cost.getText().isEmpty() || sell.getText().isEmpty()){
+                if(name.getText().isEmpty() || cost.getText().isEmpty() || sell.getText().isEmpty() || category.getText().isEmpty()){
                     AlertBox.display("Error!!", "One the required fields is empty...");
                 }
                 else if(Double.parseDouble(cost.getText()) >= Double.parseDouble(sell.getText())) AlertBox.display("Error", "Sell price should be greater than cost price");
                 else {
-                    prod = new Product(name.getText(), Double.parseDouble(cost.getText()), Double.parseDouble(sell.getText()), prodId);
+                    prod = new Product(name.getText(), category.getText(), Double.parseDouble(cost.getText()), Double.parseDouble(sell.getText()), prodId);
                     prodId++;
                     AlertBox.display("Creation", "Product created successfully");
 

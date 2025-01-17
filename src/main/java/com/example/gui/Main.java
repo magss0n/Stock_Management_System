@@ -1,5 +1,5 @@
 package com.example.gui;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
@@ -14,10 +14,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class Main extends Application {
     static Stage window;
@@ -32,11 +34,102 @@ public class Main extends Application {
     static StockMovement stockMovement = new StockMovement();
     static Integer attempts = 0;
 
+    private static final String ENTRIES = "C:\\Users\\Time_for_Business\\Documents\\INGE 3 ISI\\OOP\\StockManagement\\json_files\\entries.json";
+    private static final String EXITS = "C:\\Users\\Time_for_Business\\Documents\\INGE 3 ISI\\OOP\\StockManagement\\json_files\\exits.json";
+    private static final String STOCK = "C:\\Users\\Time_for_Business\\Documents\\INGE 3 ISI\\OOP\\StockManagement\\json_files\\products.json";
+    private static final String SUPPLIERS = "C:\\Users\\Time_for_Business\\Documents\\INGE 3 ISI\\OOP\\StockManagement\\json_files\\suppliers.json";
+    private static final String CUSTOMERS = "C:\\Users\\Time_for_Business\\Documents\\INGE 3 ISI\\OOP\\StockManagement\\json_files\\customers.json";
+
+
+    static final ObjectMapper objectMapper = new ObjectMapper();
+
+    // Read users from the JSON file
+    public static List<StockEntry> readStockEntries() throws IOException {
+        StockEntry[] stockEntriesArray = objectMapper.readValue(new File(ENTRIES), StockEntry[].class);
+        return new ArrayList<>(Arrays.asList(stockEntriesArray));
+    }
+
+    public static void writeStockEntries(List<StockEntry> entries) throws IOException {
+        try {
+            objectMapper.writeValue(new File(ENTRIES), entries);
+            System.out.println("Added successfully.");
+        } catch (IOException e) {
+            System.err.println("Error writing users to file: " + e.getMessage());
+            throw e; // Re-throw the exception after logging
+        }
+    }
+
+    public static List<StockExit> readStockExits() throws IOException {
+        StockExit[] stockExitsArray = objectMapper.readValue(new File(EXITS), StockExit[].class);
+        return new ArrayList<>(Arrays.asList(stockExitsArray));
+    }
+
+    public static void writeStockExits(List<StockExit> exits) throws IOException {
+        try {
+            objectMapper.writeValue(new File(EXITS), exits);
+            System.out.println("Added successfully.");
+        } catch (IOException e) {
+            System.err.println("Error writing users to file: " + e.getMessage());
+            throw e; // Re-throw the exception after logging
+        }
+    }
+
+    public static List<Customer> readCustomers() throws IOException {
+        Customer[] customers = objectMapper.readValue(new File(CUSTOMERS), Customer[].class);
+        return new ArrayList<>(Arrays.asList(customers));
+    }
+
+    public static void writeCustomers(List<Customer> customers) throws IOException {
+        try {
+            objectMapper.writeValue(new File(CUSTOMERS), customers);
+            System.out.println("Added successfully.");
+        } catch (IOException e) {
+            System.err.println("Error writing users to file: " + e.getMessage());
+            throw e; // Re-throw the exception after logging
+        }
+    }
+
+    public static List<Supplier> readSuppliers() throws IOException {
+        Supplier[] suppliers = objectMapper.readValue(new File(SUPPLIERS), Supplier[].class);
+        System.out.println("File Suppliers: " + new ArrayList<>(Arrays.asList(suppliers)));
+        return new ArrayList<>(Arrays.asList(suppliers));
+    }
+
+    public static void writeSuppliers(List<Supplier> suppliers) throws IOException {
+        try {
+            objectMapper.writeValue(new File(SUPPLIERS), suppliers);
+            System.out.println("Added successfully.");
+        } catch (IOException e) {
+            System.err.println("Error writing users to file: " + e.getMessage());
+            throw e; // Re-throw the exception after logging
+        }
+    }
+
+    public static List<Product> readProducts() throws IOException {
+        Product[] products = objectMapper.readValue(new File(STOCK), Product[].class);
+        return new ArrayList<>(Arrays.asList(products));
+    }
+
+    public static void writeProducts(List<Product> products) throws IOException {
+        try {
+            objectMapper.writeValue(new File(STOCK), products);
+            System.out.println("Added successfully.");
+        } catch (IOException e) {
+            System.err.println("Error writing users to file: " + e.getMessage());
+            throw e; // Re-throw the exception after logging
+        }
+    }
 
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) throws IOException {
         window = stage;
+
+        suppliers = readSuppliers();
+        customers = readCustomers();
+        stock.setProducts(readProducts());
+        stockMovement.stockSales = readStockExits();
+        stockMovement.stockPurchases = readStockEntries();
 
         //creating label email
         Text text1 = new Text("User ID:");
@@ -69,7 +162,6 @@ public class Main extends Application {
             }
             else {
                 mainMenu();
-
             }
         });
         Button button2 = new Button("Clear");
@@ -129,10 +221,22 @@ public class Main extends Application {
         layout.setMinSize(800,800);
 
         Button b1 = new Button("Stock Entry");
-        b1.setOnAction(event -> saveStockEntry());
+        b1.setOnAction(event -> {
+            try {
+                saveStockEntry();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         Button b2 = new Button("Stock Exit");
-        b2.setOnAction(event -> saveStockExit());
+        b2.setOnAction(event -> {
+            try {
+                saveStockExit();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         Button b3 = new Button("View Stock");
         b3.setOnAction(event -> viewStock());
@@ -141,12 +245,25 @@ public class Main extends Application {
         b4.setOnAction(event -> viewCustomersOrSuppliers());
 
         Button b5 = new Button("View Purchase Report");
-        b5.setOnAction(event -> new PurchaseReport((stockMovement)).display());// added b5 b6 for purchase and sales reports
-
+        b5.setOnAction(event -> {
+            try {
+                stockMovement.stockPurchases = readStockEntries();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            PurchaseReport report = new PurchaseReport(stockMovement);
+            report.display();
+        });
         Button b6 = new Button("View Sales Report");
-        b6.setOnAction(event -> new PurchaseReport((stockMovement)).display());
-
-
+        b6.setOnAction(event -> {
+            try {
+                stockMovement.stockSales = readStockExits();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            SalesReport report = new SalesReport(stockMovement);
+            report.display();
+        });
         Button b7 = new Button("Exit");
         b7.setStyle("-fx-color: RED;");
         b7.setOnAction(event -> {
@@ -161,7 +278,9 @@ public class Main extends Application {
         window.show();
     }
 
-    private static void saveStockEntry(){
+    private static void saveStockEntry() throws IOException {
+//        stock.setProducts(readProducts());
+
         Text t = new Text("Enter Transaction details");
 
         VBox vbox = new VBox(40);
@@ -215,16 +334,36 @@ public class Main extends Application {
             Supplier s = RecordEntity.supplier("New Supplier");
             System.out.println("Supplier: " + s);
             if (s != null) {
+                try {
+                    suppliers = readSuppliers();
+                } catch (IOException e) {
+                    suppliers = new ArrayList<>();
+                }
                 suppliers.add(s);
+                try {
+                    writeSuppliers(suppliers);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 supplierlist.getItems().add(suppliers.stream().map(supplier -> supplier.name).toList().getLast());
             }
-            System.out.println("Supplier: " + s);
+            System.out.println("Supplier: " + suppliers);
         });
 
         newProduct.setOnAction(event -> {
             Product p = RecordEntity.product("New Product");
             if(p != null){
+//                try {
+//                    stock.setProducts(readProducts());
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
                 stock.addProduct(p);
+                try {
+                    writeProducts(stock.getProducts());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 productlist.getItems().addAll(stock.getProducts().stream().map(product -> product.name).toList().getLast());
             }
             System.out.println("Product: " + p);
@@ -247,8 +386,13 @@ public class Main extends Application {
                         AlertBox.display("Error", "Purchase amount and Quantity do not match Cost Price");
                     }
                     else{
+//                        stock.setProducts(readProducts());
                         stock.setQty(prodSelected, quantity);
+                        writeProducts(stock.getProducts());
+                        stockMovement.stockPurchases = readStockEntries();
                         stockMovement.stockPurchases.add(new StockEntry(supSelected,amt, prodSelected, quantity));
+                        writeStockEntries(stockMovement.stockPurchases);
+
                         System.out.println("Entries" + stockMovement.stockPurchases);
                         AlertBox.display("Successful", "Stock Entry Successfully saved");
                         window.setScene(scene2);
@@ -272,7 +416,9 @@ public class Main extends Application {
         window.show();
     }
 
-    private static void saveStockExit(){
+    private static void saveStockExit() throws IOException {
+//        stock.setProducts(readProducts());
+
         Text t = new Text("Enter Transaction details");
 
         VBox vbox = new VBox(40);
@@ -325,7 +471,17 @@ public class Main extends Application {
             Customer c = RecordEntity.customer("New Customer");
             System.out.println("Customer: " + c);
             if (c != null) {
+                try {
+                    customers = readCustomers();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 customers.add(c);
+                try {
+                    writeCustomers(customers);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 customerlist.getItems().add(customers.stream().map(customer -> customer.name).toList().getLast());
             }
             System.out.println("Customer: " + c);
@@ -335,7 +491,11 @@ public class Main extends Application {
             System.out.println("SElect: " + customerlist.getValue());
             try {
                 custSelected = customers.stream().filter(customer -> Objects.equals(customer.name, customerlist.getValue())).toList().getFirst();
+                System.out.println("Customer: " + custSelected);
+
                 prodSelected = stock.getProducts().stream().filter(product -> Objects.equals(product.name, productlist.getValue())).toList().getFirst();
+                System.out.println("Product: " + prodSelected);
+
             } catch (Exception e) {
 //               //Do nothing, let the next if-else block display the AlertBox
             }
@@ -344,19 +504,25 @@ public class Main extends Application {
                 try {
                     Integer quantity = Integer.parseInt(qty.getText());
                     Double amt = Double.parseDouble(amount.getText());
-
-                    if (stock.editProductQty(prodSelected, quantity)){
-                        stockMovement.stockSales.add(new StockExit(custSelected, prodSelected,amt, quantity));
-                        System.out.println("Sales: " + stockMovement.stockSales);
-                        AlertBox.display("Successful", "Stock Exit Successfully saved");
-                        window.setScene(scene2);
-
+                    System.out.println("quantity" + quantity + " amt " + amt);
+                    var a = amt/quantity;
+                    if((a > prodSelected.getCostPrice() && a < prodSelected.sellPrice) || a >= prodSelected.sellPrice){
+//                        stock.setProducts(readProducts());
+                        if (stock.editProductQty(prodSelected, quantity)) {
+//                            stockMovement.stockSales = readStockExits();
+                            stockMovement.stockSales.add(new StockExit(custSelected, prodSelected, amt, quantity));
+                            writeStockExits(stockMovement.stockSales);
+                            System.out.println("Sales: " + stockMovement.stockSales);
+                            AlertBox.display("Successful", "Stock Exit Successfully saved");
+                            window.setScene(scene2);
+                        }
                     }
+                    else AlertBox.display("Error", "Quantity and amount sold don't match Product price");
 
                 } catch (Exception e) {
                     AlertBox.display("Error","Quantity and Sales amount should be numbers");
+                    throw new RuntimeException(e);
                 }
-
             }
             else AlertBox.display("Error", "One of the  required fields is empty");
         });
@@ -379,7 +545,17 @@ public class Main extends Application {
         listView.setOnMouseClicked(mouseEvent -> {
             if(!listView.getItems().isEmpty()){
                 prodSelected = listView.getSelectionModel().getSelectedItem();
+                try {
+                    stock.setProducts(readProducts());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 stock.editProduct(prodSelected);
+                try {
+                    writeProducts(stock.getProducts());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 viewStock();
             }
         });
@@ -392,7 +568,17 @@ public class Main extends Application {
         newProduct.setOnAction(event -> {
             Product p = RecordEntity.product("New Product");
             if(p != null){
+                try {
+                    stock.setProducts(readProducts());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 stock.addProduct(p);
+                try {
+                    writeProducts(stock.getProducts());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 viewStock();
             }
             System.out.println("Product: " + p);
@@ -422,8 +608,19 @@ public class Main extends Application {
             if(!customerListView.getItems().isEmpty()){
                 custSelected = customerListView.getSelectionModel().getSelectedItem();
                 if(custSelected != null){
-                    Integer i = customers.indexOf(custSelected);
+                    try {
+                        customers = readCustomers();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    Customer c = customers.stream().filter(customer -> Objects.equals(customer.name, custSelected.name)).toList().getFirst();
+                    Integer i = customers.indexOf(c);
                     EditEntity.customer(customers.get(i));
+                    try {
+                        writeCustomers(customers);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                     viewCustomersOrSuppliers();
                 }
             }
@@ -437,7 +634,18 @@ public class Main extends Application {
         newCustomer.setOnAction(event -> {
             Customer c = RecordEntity.customer("New Customer");
             if(c != null){
+                try {
+                    customers = readCustomers();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 customers.add(c);
+
+                try {
+                    writeCustomers(customers);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 viewCustomersOrSuppliers();
             }
             System.out.println("Customer: " + c);
@@ -457,8 +665,19 @@ public class Main extends Application {
             if(!supplierListView.getItems().isEmpty()){
                 supSelected = supplierListView.getSelectionModel().getSelectedItem();
                 if(supSelected != null){
-                    Integer i = suppliers.indexOf(supSelected);
+                    try {
+                        suppliers = readSuppliers();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    Supplier s = suppliers.stream().filter(supplier -> Objects.equals(supplier.name, supSelected.name)).toList().getFirst();
+                    Integer i = suppliers.indexOf(s);
                     EditEntity.supplier(suppliers.get(i));
+                    try {
+                        writeSuppliers(suppliers);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                     viewCustomersOrSuppliers();
                 }
             }
@@ -470,7 +689,17 @@ public class Main extends Application {
         newSupplier.setOnAction(event -> {
             Supplier s = RecordEntity.supplier("New Supplier");
             if(s != null){
+                try {
+                    suppliers = readSuppliers();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 suppliers.add(s);
+                try {
+                    writeSuppliers(suppliers);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 viewCustomersOrSuppliers();
             }
             System.out.println("Supplier: " + s);

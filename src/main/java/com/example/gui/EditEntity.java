@@ -16,6 +16,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class EditEntity {
 
     static Supplier sup;
@@ -162,6 +164,9 @@ public class EditEntity {
         Label l1 = new Label("Name:");
         TextField name = new TextField(p.name);
 
+        Label l5 = new Label("Category:");
+        TextField category = new TextField("Enter category");
+
         Label l2 = new Label("Cost Price:");
         TextField cost = new TextField("" + p.getCostPrice());
 
@@ -180,18 +185,21 @@ public class EditEntity {
         gridPane.add(l1,0,0);
         gridPane.add(name,1,0);
 
-        gridPane.add(l2, 0,1);
-        gridPane.add(cost, 1,1);
+        gridPane.add(l5,0,1);
+        gridPane.add(category,1,1);
 
-        gridPane.add(l3, 0,2);
-        gridPane.add(sell, 1,2);
+        gridPane.add(l2, 0,3);
+        gridPane.add(cost, 1,3);
 
-        gridPane.add(l4, 0,3);
-        gridPane.add(qty, 1,3);
+        gridPane.add(l3, 0,4);
+        gridPane.add(sell, 1,4);
 
-        gridPane.add(save, 5,5);
-        gridPane.add(cancel, 6, 5);
-        gridPane.add(delete, 7, 5);
+        gridPane.add(l4, 0,5);
+        gridPane.add(qty, 1,5);
+
+        gridPane.add(save, 5,7);
+        gridPane.add(cancel, 6, 7);
+        gridPane.add(delete, 7, 7);
 
         gridPane.setHgap(10);
         gridPane.setVgap(10);
@@ -199,7 +207,7 @@ public class EditEntity {
 
         save.setOnAction(event -> {
             try{
-                if(name.getText().isEmpty() || cost.getText().isEmpty() || sell.getText().isEmpty() || qty.getText().isEmpty()){
+                if(name.getText().isEmpty() || cost.getText().isEmpty() || sell.getText().isEmpty() || qty.getText().isEmpty() || category.getText().isEmpty()){
                     AlertBox.display("Error!!", "One the required fields is empty...");
                 }
                 else if(Double.parseDouble(cost.getText()) >= Double.parseDouble(sell.getText())) AlertBox.display("Error", "Sell price should be greater than cost price");
@@ -208,6 +216,7 @@ public class EditEntity {
                     p.sellPrice = Double.parseDouble(sell.getText());
                     p.name = name.getText();
                     p.setQty(Integer.parseInt(qty.getText()));
+                    p.category = category.getText();
 
                     AlertBox.display("Edit", "Product Edited successfully");
                     window.close();
@@ -219,7 +228,11 @@ public class EditEntity {
 
         delete.setOnAction(event -> {
             if(AlertBox.confirm("Deletion")){
-                st.deleteProduct(p);
+                try {
+                    st.deleteProduct(p);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 window.close();
             }
         });
